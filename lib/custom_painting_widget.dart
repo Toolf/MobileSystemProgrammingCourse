@@ -33,18 +33,6 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Switch(
-              //   value: _checkbox,
-              //   onChanged: (value) {
-              //     setState(() {
-              //       _checkbox = value;
-              //       _painterIndex = value ? 1 : 0;
-              //     });
-              //   },
-              //   activeTrackColor: Colors.lightBlue,
-              //   activeColor: Colors.blue,
-              //   materialTapTargetSize: MaterialTapTargetSize.padded,
-              // ),
               ToggleSwitch(
                 value: _painterIndex,
                 onChange: (int value) {
