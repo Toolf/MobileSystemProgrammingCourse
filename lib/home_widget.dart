@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/custom_painting_widget.dart';
 import 'package:flutter_application_1/person_widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,7 +14,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _children = [
     Person(),
-    Scaffold(), // заглушка
+    DrawingCanvas(), // заглушка
   ];
 
   @override
