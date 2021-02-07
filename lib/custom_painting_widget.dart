@@ -114,7 +114,7 @@ class CosPainter extends CustomPainter {
     int scale = 40;
 
     var paint = Paint()
-      ..color = Colors.grey
+      ..color = Colors.black
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.butt;
@@ -129,7 +129,7 @@ class CosPainter extends CustomPainter {
     canvas.drawLine(Offset(center.dx, 0), Offset(center.dx + 5, 10), paint);
 
     canvas.drawLine(Offset(0, center.dy), Offset(size.width, center.dy), paint);
-    //drow arrow
+    // draw arrow
     canvas.drawLine(Offset(size.width, center.dy),
         Offset(size.width - 10, center.dy - 5), paint);
     canvas.drawLine(Offset(size.width, center.dy),
