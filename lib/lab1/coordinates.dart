@@ -13,11 +13,7 @@ class CoordinateNS {
   int minutes;
   int seconds;
 
-  CoordinateNS(
-      {this.degree: 0,
-      this.minutes: 0,
-      this.seconds: 0,
-      this.direction: Direction.north})
+  CoordinateNS({this.degree, this.minutes, this.seconds, this.direction})
       : assert(
             (direction == Direction.north ||
                     direction == Direction.south &&
@@ -30,6 +26,9 @@ class CoordinateNS {
                     (0 <= minutes && minutes <= 59) &&
                     (0 <= seconds && seconds <= 59),
             'degree: $degree, minutes: $minutes, seconds: $seconds, direction: $direction');
+
+  CoordinateNS.defaultContruct()
+      : this(degree: 0, minutes: 0, seconds: 0, direction: Direction.north);
 
   String getNamedDirection() {
     String directionChar;
@@ -103,7 +102,7 @@ void main(List<String> args) {
   CoordinateNS c1 = CoordinateNS(
       degree: 90, minutes: 3, seconds: 0, direction: Direction.north);
   // виклик конструктора без парамертрів та пошук середини
-  CoordinateNS middlePoint = c1.getMiddlePoint(CoordinateNS());
+  CoordinateNS middlePoint = c1.getMiddlePoint(CoordinateNS.defaultContruct());
   print('Результат методу toString: ${c1.toString()}');
   print('Результат методу decimalDegree: ${c1.decimalDegree()}');
   if (middlePoint != null) {
