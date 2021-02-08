@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/custom_painting_widget.dart';
-import 'package:flutter_application_1/person_widget.dart';
+
+import 'custom_painting.dart';
+import 'person.dart';
+import 'bookList.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -14,7 +16,8 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _children = [
     Person(),
-    DrawingCanvas(), // заглушка
+    DrawingCanvas(),
+    BookList(),
   ];
 
   @override
@@ -32,6 +35,10 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.pie_chart),
             label: "Pie",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.view_list),
+            label: "Books",
           ),
         ],
       ),
