@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-import 'package:flutter_application_1/toggleswitch_widget.dart';
+import 'toggleswitch_widget.dart';
 
 class DrawingCanvas extends StatefulWidget {
   DrawingCanvas({Key key}) : super(key: key);

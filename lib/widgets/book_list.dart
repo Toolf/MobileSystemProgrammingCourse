@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/services/book_service.dart';
@@ -29,7 +27,7 @@ class _BookListState extends State<BookList> {
     widget.bookService.getBooks().then((List<Book> books) async {
       List<Widget> bookWidgets = List();
       for (Book book in books) {
-        bookWidgets.add(await buildItem(book));
+        bookWidgets.add(await _buildItem(book));
       }
       setState(() {
         this.books = books;
@@ -72,7 +70,7 @@ class _BookListState extends State<BookList> {
     }
   }
 
-  Future<Widget> buildItem(Book book) async {
+  Future<Widget> _buildItem(Book book) async {
     Widget image;
     if (book.image != "") {
       image = await _getImage('assets/Images/${book.image}');
@@ -117,7 +115,7 @@ class _BookListState extends State<BookList> {
   }
 
   void _removeBook(book) async {
-    Widget bookWidget = await buildItem(book);
+    Widget bookWidget = await _buildItem(book);
     AnimatedListRemovedItemBuilder builder = (context, animation) {
       return SizeTransition(
         sizeFactor: animation,
