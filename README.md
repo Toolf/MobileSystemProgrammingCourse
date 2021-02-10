@@ -28,6 +28,7 @@
 Приклад роботи в портретному режимі
 (відео в .mp4 лижить в readme_images)
 ![](readme_images/portrait_video.gif)
+<br/>
 Приклад роботи в портретному режимі
 (відео в .mp4 лижить в readme_images)
 ![](readme_images/landscape_video.gif)
