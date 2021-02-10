@@ -23,4 +23,19 @@ class LocalBookService implements BookService {
       return [];
     }
   }
+
+  @override
+  Future<Book> getBook(String isbn13) async {
+    try {
+      // Read the file.
+      String data = await rootBundle.loadString('assets/id/$isbn13.txt');
+
+      dynamic jsonBook = jsonDecode(data);
+      Book book = Book.fromJson(jsonBook);
+      return book;
+    } catch (e) {
+      // If encountering an error, return null.
+      return null;
+    }
+  }
 }
