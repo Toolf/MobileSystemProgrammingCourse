@@ -109,7 +109,7 @@ class _BookListState extends State<BookList> {
   }
 
   Future<Widget> _buildItem(Book book) async {
-    Image image = _getImageOfBook(book);
+    Image image = _getBookImage(book);
     return Slidable(
       key: Key(book.title),
       actionPane: SlidableScrollActionPane(),
@@ -196,7 +196,7 @@ class _BookListState extends State<BookList> {
   Route _bookDetailsRoute(Book book) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => BookPage(
-        image: _getImageOfBook(book),
+        image: _getBookImage(book),
         title: book.title,
         subtitle: book.subtitle,
         price: book.price,
