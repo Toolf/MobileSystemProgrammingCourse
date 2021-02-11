@@ -3,9 +3,10 @@ import 'package:flutter_application_1/models/api_models.dart';
 
 class BookAdd extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController titleEditingController = TextEditingController();
-  TextEditingController subtitleEditingController = TextEditingController();
-  TextEditingController priceEditingController = TextEditingController();
+  final TextEditingController titleEditingController = TextEditingController();
+  final TextEditingController subtitleEditingController =
+      TextEditingController();
+  final TextEditingController priceEditingController = TextEditingController();
 
   final Function onValid;
 

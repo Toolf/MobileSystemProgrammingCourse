@@ -6,7 +6,7 @@ class Book {
   final String subtitle;
   final String isbn13;
   final String price;
-  final Image image;
+  final String image;
 
   final String authors;
   final String publisher;
@@ -35,9 +35,7 @@ class Book {
           subtitle: json['subtitle'],
           isbn13: json['isbn13'],
           price: json['price'],
-          image: json['image'] != ""
-              ? Image.asset('assets/Images/${json['image']}')
-              : null,
+          image: json['image'],
           publisher: json['publisher'],
           pages: json['pages'],
           year: json['year'],

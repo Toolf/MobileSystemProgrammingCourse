@@ -92,9 +92,12 @@ class _BookListState extends State<BookList> {
         children: [
           Flexible(
             child: showWidgets.length != 0
-                ? ListView.builder(
-                    itemCount: showWidgets.length,
-                    itemBuilder: (context, index) => showWidgets[index],
+                ? AnimatedContainer(
+                    duration: Duration(seconds: 1),
+                    child: ListView.builder(
+                      itemCount: showWidgets.length,
+                      itemBuilder: (context, index) => showWidgets[index],
+                    ),
                   )
                 : Center(
                     child: Text("No items found"),
@@ -106,12 +109,7 @@ class _BookListState extends State<BookList> {
   }
 
   Future<Widget> _buildItem(Book book) async {
-    Widget image;
-    if (book.image == null) {
-      image = SizedBox.shrink(); // return default image
-    } else {
-      image = book.image;
-    }
+    Image image = _getImageOfBook(book);
     return Slidable(
       key: Key(book.title),
       actionPane: SlidableScrollActionPane(),
@@ -131,13 +129,13 @@ class _BookListState extends State<BookList> {
             ],
           ),
           leading: Container(
-            child: image,
+            child: image != null ? image : SizedBox.shrink(),
             width: 50,
           ),
           onTap: () async {
             Book bookMore = await widget.bookService.getBook(book.isbn13);
             if (bookMore != null) {
-              Navigator.of(context).push(_createRoute(bookMore));
+              Navigator.of(context).push(_bookDetailsRoute(bookMore));
             } else {
               Scaffold.of(context).showSnackBar(SnackBar(
                   duration: const Duration(seconds: 1),
@@ -183,10 +181,33 @@ class _BookListState extends State<BookList> {
     });
   }
 
-  Route _createRoute(Book book) {
+  Image _getBookImage(Book book) {
+    if (widget.bookService is LocalBookService) {
+      if (book.image == "") {
+        return null;
+      } else {
+        return Image.asset('assets/Images/${book.image}');
+      }
+    } else {
+      return null;
+    }
+  }
+
+  Route _bookDetailsRoute(Book book) {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          BookPage(book: book),
+      pageBuilder: (context, animation, secondaryAnimation) => BookPage(
+        image: _getImageOfBook(book),
+        title: book.title,
+        subtitle: book.subtitle,
+        price: book.price,
+        authors: book.authors,
+        desc: book.desc,
+        isbn13: book.isbn13,
+        pages: book.pages,
+        publisher: book.publisher,
+        rating: book.rating,
+        year: book.year,
+      ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(1.0, 0.0);
         var end = Offset.zero;

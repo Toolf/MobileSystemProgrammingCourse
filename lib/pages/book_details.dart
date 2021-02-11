@@ -2,28 +2,40 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import '../models/api_models.dart';
-
 class BookPage extends StatelessWidget {
-  final Book book;
   final double fontSize = 18;
+
+  final String price;
+  final String title;
+  final String subtitle;
+  final String isbn13;
+  final Image image;
+  final String publisher;
+  final String pages;
+  final String year;
+  final String rating;
+  final String desc;
+  final String authors;
 
   const BookPage({
     Key key,
-    @required this.book,
+    @required this.title,
+    @required this.subtitle,
+    @required this.price,
+    this.isbn13 = "",
+    this.image,
+    this.publisher = "",
+    this.pages = "",
+    this.year = "",
+    this.rating = "",
+    this.desc = "",
+    this.authors = "",
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     Widget content;
 
-    // Orientation orientation = MediaQuery.of(context).orientation;
-
-    // if (orientation == Orientation.portrait) {
-    //   content = portraitView();
-    // } else {
-    //   content = landscapeView();
-    // }
     content = view();
 
     return Scaffold(
@@ -40,8 +52,8 @@ class BookPage extends StatelessWidget {
     return Column(
       children: [
         Hero(
-          tag: "book-${book.title}",
-          child: book.image != null ? book.image : Container(),
+          tag: "book-$title",
+          child: image != null ? image : Container(),
         ),
         Container(
           width: window.physicalSize.width,
@@ -63,7 +75,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.title,
+                        text: title,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -85,7 +97,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.subtitle,
+                        text: subtitle,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -107,7 +119,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.desc,
+                        text: desc,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -132,7 +144,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.authors,
+                        text: authors,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -154,7 +166,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.publisher,
+                        text: publisher,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -179,7 +191,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.pages,
+                        text: pages,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -201,7 +213,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.year,
+                        text: year,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -223,7 +235,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.rating,
+                        text: rating,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
