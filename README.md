@@ -96,9 +96,7 @@ class Book {
           subtitle: json['subtitle'],
           isbn13: json['isbn13'],
           price: json['price'],
-          image: json['image'] != ""
-              ? Image.asset('assets/Images/${json['image']}')
-              : null,
+          image: json['image'],
           publisher: json['publisher'],
           pages: json['pages'],
           year: json['year'],
@@ -258,28 +256,40 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import '../models/api_models.dart';
-
 class BookPage extends StatelessWidget {
-  final Book book;
   final double fontSize = 18;
+
+  final String price;
+  final String title;
+  final String subtitle;
+  final String isbn13;
+  final Image image;
+  final String publisher;
+  final String pages;
+  final String year;
+  final String rating;
+  final String desc;
+  final String authors;
 
   const BookPage({
     Key key,
-    @required this.book,
+    @required this.title,
+    @required this.subtitle,
+    @required this.price,
+    this.isbn13 = "",
+    this.image,
+    this.publisher = "",
+    this.pages = "",
+    this.year = "",
+    this.rating = "",
+    this.desc = "",
+    this.authors = "",
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     Widget content;
 
-    // Orientation orientation = MediaQuery.of(context).orientation;
-
-    // if (orientation == Orientation.portrait) {
-    //   content = portraitView();
-    // } else {
-    //   content = landscapeView();
-    // }
     content = view();
 
     return Scaffold(
@@ -296,8 +306,8 @@ class BookPage extends StatelessWidget {
     return Column(
       children: [
         Hero(
-          tag: "book-${book.title}",
-          child: book.image != null ? book.image : Container(),
+          tag: "book-$title",
+          child: image != null ? image : Container(),
         ),
         Container(
           width: window.physicalSize.width,
@@ -319,7 +329,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.title,
+                        text: title,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -341,7 +351,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.subtitle,
+                        text: subtitle,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -363,7 +373,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.desc,
+                        text: desc,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -388,7 +398,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.authors,
+                        text: authors,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -410,7 +420,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.publisher,
+                        text: publisher,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -435,7 +445,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.pages,
+                        text: pages,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -457,7 +467,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.year,
+                        text: year,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -479,7 +489,7 @@ class BookPage extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: book.rating,
+                        text: rating,
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: fontSize,
@@ -595,9 +605,12 @@ class _BookListState extends State<BookList> {
         children: [
           Flexible(
             child: showWidgets.length != 0
-                ? ListView.builder(
-                    itemCount: showWidgets.length,
-                    itemBuilder: (context, index) => showWidgets[index],
+                ? AnimatedContainer(
+                    duration: Duration(seconds: 1),
+                    child: ListView.builder(
+                      itemCount: showWidgets.length,
+                      itemBuilder: (context, index) => showWidgets[index],
+                    ),
                   )
                 : Center(
                     child: Text("No items found"),
@@ -609,12 +622,7 @@ class _BookListState extends State<BookList> {
   }
 
   Future<Widget> _buildItem(Book book) async {
-    Widget image;
-    if (book.image == null) {
-      image = SizedBox.shrink(); // return default image
-    } else {
-      image = book.image;
-    }
+    Image image = _getBookImage(book);
     return Slidable(
       key: Key(book.title),
       actionPane: SlidableScrollActionPane(),
@@ -634,13 +642,13 @@ class _BookListState extends State<BookList> {
             ],
           ),
           leading: Container(
-            child: image,
+            child: image != null ? image : SizedBox.shrink(),
             width: 50,
           ),
           onTap: () async {
             Book bookMore = await widget.bookService.getBook(book.isbn13);
             if (bookMore != null) {
-              Navigator.of(context).push(_createRoute(bookMore));
+              Navigator.of(context).push(_bookDetailsRoute(bookMore));
             } else {
               Scaffold.of(context).showSnackBar(SnackBar(
                   duration: const Duration(seconds: 1),
@@ -686,10 +694,33 @@ class _BookListState extends State<BookList> {
     });
   }
 
-  Route _createRoute(Book book) {
+  Image _getBookImage(Book book) {
+    if (widget.bookService is LocalBookService) {
+      if (book.image == "") {
+        return null;
+      } else {
+        return Image.asset('assets/Images/${book.image}');
+      }
+    } else {
+      return null;
+    }
+  }
+
+  Route _bookDetailsRoute(Book book) {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          BookPage(book: book),
+      pageBuilder: (context, animation, secondaryAnimation) => BookPage(
+        image: _getBookImage(book),
+        title: book.title,
+        subtitle: book.subtitle,
+        price: book.price,
+        authors: book.authors,
+        desc: book.desc,
+        isbn13: book.isbn13,
+        pages: book.pages,
+        publisher: book.publisher,
+        rating: book.rating,
+        year: book.year,
+      ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(1.0, 0.0);
         var end = Offset.zero;
