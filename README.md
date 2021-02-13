@@ -7,21 +7,15 @@
 
 ## Варіант №2
 
-1. Візьміть за основу проект із лабораторної роботи 3.
-2. В даній роботі необхідно розширити функціональність створеного у попередній роботі екрану списку сутностей.
-3. Предметну область визначте за варіантом, де варіант = (номер залікової книжки mod 2) + 1, завантажте відповідний архів з файлами, додайте файли до проекту: файли <movie_id>.txt або <book_id>.txt, містять в собі розширені дані про модельні сутності у форматі JSON.
-   | Варіант 1 | Варіант 2 |
-   |-----------|-----------|
-   |Предметна область – фільми | Предметна область – книги |
-4. Розширте, створений у попередній роботі клас, який представляє модельну сутність: додайте нові поля до класу (перегляньте вихідні дані з файлів <movie_id>.txt або <book_id>.txt).
-5. Додайте новий екран, на якому відображатиметься повна інформація про сутність. При кліку на рядок таблиці зі списком сутностей, повинен відкритися екран з повною інформацією про відповідну сутність (повна інформація про сутність зчитується з файлів <movie_id>.txt або <book_id>.txt).
-6. Додайте поле для пошуку на екран зі списком сутностей. Після введення запиту необхідно відобразити відфільтрований список сутностей. Можете виконувати фільтрацію по будь-якому полю сутності. В прикладі, який наведений в кінці документу, фільтрація відбувається по назві сутності. Якщо відфільтрований список порожній, необхідно відобразити повідомлення про це.
-7. Додайте новий екран для додавання нової сутності до списку. При створенні сутності використовуйте тільки базові поля, які необхідні для відображення у списку сутностей. Не забудьте про валідацію полів: наприклад, рік (для фільму) та ціна (для книги) може мати тільки цифрове значення. Створена сутність фільму повинна бути додана до існуючого списку і відобразитися у таблиці.
-8. Додайте функціональність видалення сутності із списку фільмів (стандартний функціонал видалення із таблиці в iOS – свайп відповідного рядка вліво).
-9. Переконайтеся, що можете запустити проект, та що все працює коректно.
-10. Закомітьте та відправте ваш проект до будь-якої системи контролю версій.
-11. Підготуйте протокол за шаблоном.
-12. Надішліть виконане завдання через Google Classroom - додайте посилання до вашого проекту та протокол.
+1. Візьміть за основу проект із лабораторної роботи 4.
+2. Додайте четверту вкладку у контейнерний вигляд UITabBarController. Вкажіть будь-яку назву та зображення за бажанням, які відрізняються від стандартних, для вкладки. На екрані четвертої вкладки буде відображатися колекція картинок.
+3. Додайте вигляд колекції (UICollectionView) на екран. Кожна комірка колекції (UICollectionViewCell) буде відображати зображення (UIImage). Додайте до комірки колекції вигляд для відображення зображення (UIImageView). Ширина колекції повинна дорівнювати ширині екрану, вміст колекції прокручується вертикально.
+4. Забезпечте можливість відображати у колекції зображення, які користувач буде обирати із системної галереї зображень за допомогою контролера вигляду, що надає системний інтерфейс (UIImagePickerController). Додайте кнопку (або будь-який інший елемент керування), при натисканні на яку, відкривається контролер вигляду, що представляє системну галерею зображень. Після того як користувач обирає зображення, контролер вигляду, що представляє системну галерею зображень, закривається, і зображення додається та відображається у колекції.
+5. Сітку для розташування та відносних розмірів комірок колекції оберіть за варіантом, де варіант = (номер залікової книжки mod 6) + 1. Зображена частина сітки, що повторюється, цифрою показаний відносний розмір кожної комірки. (Приклад – сітка з рекомендаціями на вкладці пошуку в додатку Instagram).
+6. Переконайтеся, що можете запустити проект, та що все працює коректно.
+7. Закомітьте та відправте ваш проект до будь-якої системи контролю версій.
+8. Підготуйте протокол за шаблоном.
+9. Надішліть виконане завдання через Google Classroom - додайте посилання до вашого проекту та протокол.
 
 ## приклад роботи додатка
 
@@ -116,6 +110,7 @@ class Book {
 // pages/home_page.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/widgets/gallery.dart';
 
 import '../widgets/custom_painting.dart';
 import '../widgets/person.dart';
@@ -135,6 +130,7 @@ class _HomePageState extends State<HomePage> {
     Person(),
     DrawingCanvas(),
     BookList(),
+    Gallery(),
   ];
 
   @override
@@ -143,6 +139,7 @@ class _HomePageState extends State<HomePage> {
       body: _children[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         onTap: onTabTapped,
+        type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -156,6 +153,10 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.view_list),
             label: "Books",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.image),
+            label: "Gallery",
           ),
         ],
       ),
@@ -763,6 +764,79 @@ class _BookListState extends State<BookList> {
 ```
 
 ```dart {.line-numbers}
+// widgets/gallery.dart
+
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+
+import 'package:image_picker/image_picker.dart';
+
+class Gallery extends StatefulWidget {
+  Gallery({Key key}) : super(key: key);
+
+  @override
+  _GalleryState createState() => _GalleryState();
+}
+
+class _GalleryState extends State<Gallery> {
+  @override
+  Widget build(BuildContext context) {
+    return MyImagePicker(
+      build: (context, images) => StaggeredGridView.countBuilder(
+        crossAxisCount: 4,
+        itemCount: images.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Container(
+            child: images[index],
+            color: Colors.grey[300],
+          );
+        },
+        staggeredTileBuilder: (int index) => StaggeredTile.count(
+            (index % 8 == 1) ? 3 : 1, (index % 8 == 1) ? 3 : 1),
+        mainAxisSpacing: 8.0,
+        crossAxisSpacing: 8.0,
+      ),
+    );
+  }
+}
+
+class MyImagePicker extends StatefulWidget {
+  final Function(BuildContext context, List<Image> images) build;
+  MyImagePicker({Key key, this.build}) : super(key: key);
+
+  @override
+  _MyImagePickerState createState() => _MyImagePickerState();
+}
+
+class _MyImagePickerState extends State<MyImagePicker> {
+  List<Image> images = List();
+  selectImage() async {
+    File image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        images.add(Image.file(image));
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+      floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            await selectImage();
+          },
+          child: Icon(Icons.add_photo_alternate)),
+      body: widget.build(context, images),
+    );
+  }
+}
+```
+
+```dart {.line-numbers}
 // services/book_service.dart
 
 import 'package:flutter_application_1/models/api_models.dart';
@@ -821,4 +895,4 @@ class LocalBookService implements BookService {
 
 ## Висновок
 
-В даній лабораторній роботі було розширено модель Book, добалена можливість дізнавання розширеної інформації про конкретну книжку, надана можливість пошуку, видалення та додавання книжки, а такаж перегляд розширеної інформації.
+Вданій лабораторній роботі було використано StaggeredGridView з бібліотеки flutter_staggered_grid_view для розміщення картинок по завданню. Також для вибору картинок було використано бібліотеку image_picker.
