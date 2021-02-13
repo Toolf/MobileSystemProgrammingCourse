@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/widgets/gallery.dart';
 
 import '../widgets/custom_painting.dart';
 import '../widgets/person.dart';
@@ -18,6 +19,7 @@ class _HomePageState extends State<HomePage> {
     Person(),
     DrawingCanvas(),
     BookList(),
+    Gallery(),
   ];
 
   @override
@@ -26,6 +28,7 @@ class _HomePageState extends State<HomePage> {
       body: _children[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         onTap: onTabTapped,
+        type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -39,6 +42,10 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.view_list),
             label: "Books",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.image),
+            label: "Gallery",
           ),
         ],
       ),
