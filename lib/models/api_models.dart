@@ -19,14 +19,14 @@ class Book {
     @required this.title,
     @required this.subtitle,
     @required this.price,
-    this.isbn13,
-    this.image,
-    this.publisher,
-    this.pages,
-    this.year,
-    this.rating,
-    this.desc,
-    this.authors,
+    this.isbn13 = "",
+    this.image = "",
+    this.publisher = "",
+    this.pages = "",
+    this.year = "",
+    this.rating = "",
+    this.desc = "",
+    this.authors = "",
   });
 
   Book.fromJson(dynamic json)
