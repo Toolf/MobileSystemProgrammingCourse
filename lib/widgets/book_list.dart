@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/booklist/booklist_bloc.dart';
+import 'package:flutter_application_1/services/mock_book_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -6,10 +9,11 @@ import '../pages/book_add.dart';
 import '../pages/book_details.dart';
 import '../services/book_service.dart';
 import '../services/local_book_service.dart';
+import '../services/http_book_service.dart';
 import '../models/api_models.dart';
 
 class BookList extends StatefulWidget {
-  final BookService bookService = LocalBookService();
+  // final BookService bookService = MockBookService();
 
   BookList({Key key}) : super(key: key);
 
@@ -18,97 +22,132 @@ class BookList extends StatefulWidget {
 }
 
 class _BookListState extends State<BookList> {
-  List<Book> books = List();
+  List<Book> books;
   List<Widget> bookWidgets = List();
-  List<Widget> showWidgets = List();
   String searchLine = "";
+
+  GlobalKey<AnimatedListState> _anim = GlobalKey();
+  final BooklistBloc _booklistBloc = BooklistBloc(HttpBookService());
 
   @override
   void initState() {
     super.initState();
-    widget.bookService.getBooks().then((List<Book> books) async {
-      List<Widget> bookWidgets = List();
-      for (Book book in books) {
-        bookWidgets.add(await _buildItem(book));
-      }
-      setState(() {
-        this.books = books;
-        this.bookWidgets = bookWidgets;
-        this.showWidgets = bookWidgets.toList();
-      });
-    });
+    // _updateBookList();
+    _booklistBloc.add(GetBooklist(searchLine));
   }
 
   @override
   Widget build(BuildContext context) {
-    if (books.isEmpty) {
-      return Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-          child: TextField(
-            cursorColor: Colors.white,
-            style: TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              disabledBorder: InputBorder.none,
-              contentPadding:
-                  EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
-              labelText: "Search",
-              labelStyle: TextStyle(color: Colors.white),
-            ),
-            onChanged: (value) {
-              setState(() {
-                searchLine = value;
-                showWidgets = bookWidgets
-                    .where((w) =>
-                        books[bookWidgets.indexOf(w)].title.contains(value))
-                    .toList();
-              });
-            },
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 20.0),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.of(context).push(_bookAddPageRoute());
+    return BlocProvider(
+      create: (context) => _booklistBloc,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Padding(
+            padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+            child: TextField(
+              cursorColor: Colors.white,
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                contentPadding:
+                    EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
+                labelText: "Search",
+                labelStyle: TextStyle(color: Colors.white),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  searchLine = value;
+                });
+                _updateBookList();
               },
-              child: Icon(Icons.add),
             ),
-          )
-        ],
-      ),
-      body: Column(
-        children: [
-          Flexible(
-            child: showWidgets.length != 0
-                ? AnimatedContainer(
-                    duration: Duration(seconds: 1),
-                    child: ListView.builder(
-                      itemCount: showWidgets.length,
-                      itemBuilder: (context, index) => showWidgets[index],
-                    ),
-                  )
-                : Center(
-                    child: Text("No items found"),
-                  ),
           ),
-        ],
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(_bookAddPageRoute());
+                },
+                child: Icon(Icons.add),
+              ),
+            )
+          ],
+        ),
+        body: BlocConsumer(
+          cubit: _booklistBloc,
+          listener: (BuildContext context, state) {
+            if (state is BooklistError) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
+            }
+          },
+          buildWhen: (previous, current) {
+            if (current is BooklistDeleted) {
+              setState(() {
+                books.remove(current.book);
+              });
+              _booklistBloc.add(GetBooklist(searchLine));
+              return false;
+            } else if (current is BooklistAdded) {
+              if (current.book.title.contains(searchLine)) {
+                setState(() {
+                  books.add(current.book);
+                });
+              }
+              _booklistBloc.add(GetBooklist(searchLine));
+              return false;
+            } else if (current is BooklistLoading &&
+                previous is! BooklistInitial) {
+              return false;
+            }
+            return true;
+          },
+          builder: (BuildContext context, state) {
+            if (state is BooklistLoading) {
+              return buildLoading();
+            } else if (state is BooklistLoaded) {
+              books = state.books.toList();
+              return buildLoaded(books);
+            } else {
+              // if error
+              return Center();
+            }
+          },
+        ),
       ),
     );
   }
 
-  Future<Widget> _buildItem(Book book) async {
+  Widget buildLoading() {
+    return Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget buildLoaded(List<Book> books) {
+    return Column(
+      children: [
+        Flexible(
+          child: books.length != 0
+              ? ListView.builder(
+                  itemCount: books.length,
+                  itemBuilder: (context, index) => _buildItem(books[index]),
+                )
+              : Center(
+                  child: Text("No items found"),
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildItem(Book book) {
     Image image = _getBookImage(book);
     return Slidable(
       key: Key(book.title),
@@ -132,15 +171,8 @@ class _BookListState extends State<BookList> {
             child: image != null ? image : SizedBox.shrink(),
             width: 50,
           ),
-          onTap: () async {
-            Book bookMore = await widget.bookService.getBook(book.isbn13);
-            if (bookMore != null) {
-              Navigator.of(context).push(_bookDetailsRoute(bookMore));
-            } else {
-              Scaffold.of(context).showSnackBar(SnackBar(
-                  duration: const Duration(seconds: 1),
-                  content: Text("Not found resurce")));
-            }
+          onTap: () {
+            Navigator.of(context).push(_bookDetailsRoute(book));
           },
         ),
       ),
@@ -150,64 +182,38 @@ class _BookListState extends State<BookList> {
           color: Colors.red,
           icon: Icons.delete,
           onTap: () {
-            _removeBook(book);
+            _deleteBook(book);
           },
         ),
       ],
     );
   }
 
-  void _removeBook(book) {
-    var index = books.indexOf(book);
+  void _updateBookList() async {
+    _booklistBloc.add(GetBooklist(searchLine));
+  }
 
-    setState(() {
-      if (showWidgets.contains(bookWidgets[index])) {
-        showWidgets.removeAt(showWidgets.indexOf(bookWidgets[index]));
-      }
-      books.removeAt(index);
-      bookWidgets.removeAt(index);
-    });
+  void _deleteBook(book) async {
+    _booklistBloc.add(DeleteBook(book));
   }
 
   void _addBook(Book book) async {
-    Widget w = await _buildItem(book);
-
-    setState(() {
-      books.add(book);
-      bookWidgets.add(w);
-      if (book.title.contains(searchLine)) {
-        showWidgets.add(w);
-      }
-    });
+    _booklistBloc.add(AddBook(book));
   }
 
   Image _getBookImage(Book book) {
-    if (widget.bookService is LocalBookService) {
-      if (book.image == "") {
-        return null;
-      } else {
-        return Image.asset('assets/Images/${book.image}');
-      }
-    } else {
+    if (book.image == "") {
       return null;
+    } else {
+      return Image.network(book.image);
+      // return Image.asset('assets/Images/${book.image}');
     }
   }
 
   Route _bookDetailsRoute(Book book) {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => BookPage(
-        image: _getBookImage(book),
-        title: book.title,
-        subtitle: book.subtitle,
-        price: book.price,
-        authors: book.authors,
-        desc: book.desc,
-        isbn13: book.isbn13,
-        pages: book.pages,
-        publisher: book.publisher,
-        rating: book.rating,
-        year: book.year,
-      ),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          BookPage(book: book),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(1.0, 0.0);
         var end = Offset.zero;
