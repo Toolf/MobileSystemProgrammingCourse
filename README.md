@@ -30,489 +30,12 @@
 ## Лістинг коду
 
 ```dart {.line-numbers}
-// main.dart
+// book_list.dart
 
 import 'package:flutter/material.dart';
-
-import 'pages/home_page.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: HomePage(),
-    );
-  }
-}
-```
-
-```dart {.line_numbers}
-// models/api_models.dart
-
-import 'package:flutter/material.dart';
-
-@immutable
-class Book {
-  final String title;
-  final String subtitle;
-  final String isbn13;
-  final String price;
-  final Image image;
-
-  final String authors;
-  final String publisher;
-  final String pages;
-  final String year;
-  final String rating;
-  final String desc;
-
-  const Book({
-    @required this.title,
-    @required this.subtitle,
-    @required this.price,
-    this.isbn13,
-    this.image,
-    this.publisher,
-    this.pages,
-    this.year,
-    this.rating,
-    this.desc,
-    this.authors,
-  });
-
-  Book.fromJson(dynamic json)
-      : this(
-          title: json['title'],
-          subtitle: json['subtitle'],
-          isbn13: json['isbn13'],
-          price: json['price'],
-          image: json['image'],
-          publisher: json['publisher'],
-          pages: json['pages'],
-          year: json['year'],
-          rating: json['rating'],
-          desc: json['desc'],
-          authors: json['authors'],
-        );
-
-  @override
-  String toString() {
-    return 'Book: {title: $title, subtitle: $subtitle, isbn13: $isbn13, price: $price, image: $image}';
-  }
-}
-```
-
-```dart {.line-numbers}
-// pages/home_page.dart
-
-import 'package:flutter/material.dart';
-import 'package:flutter_application_1/widgets/gallery.dart';
-
-import '../widgets/custom_painting.dart';
-import '../widgets/person.dart';
-import '../widgets/book_list.dart';
-
-class HomePage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return _HomePageState();
-  }
-}
-
-class _HomePageState extends State<HomePage> {
-  int _currentIndex = 0;
-
-  final List<Widget> _children = [
-    Person(),
-    DrawingCanvas(),
-    BookList(),
-    Gallery(),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _children[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: onTabTapped,
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _currentIndex,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "Person",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.pie_chart),
-            label: "Pie",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.view_list),
-            label: "Books",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.image),
-            label: "Gallery",
-          ),
-        ],
-      ),
-    );
-  }
-
-  void onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-}
-```
-
-```dart {.line-numbers}
-// pages/book_add.dart
-
-import 'package:flutter/material.dart';
-import 'package:flutter_application_1/models/api_models.dart';
-
-class BookAdd extends StatelessWidget {
-  final _formKey = GlobalKey<FormState>();
-  TextEditingController titleEditingController = TextEditingController();
-  TextEditingController subtitleEditingController = TextEditingController();
-  TextEditingController priceEditingController = TextEditingController();
-
-  final Function onValid;
-
-  BookAdd({Key key, @required this.onValid}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: titleEditingController,
-                  decoration: InputDecoration(
-                    labelText: "Title",
-                  ),
-                ),
-                TextFormField(
-                  controller: subtitleEditingController,
-                  decoration: InputDecoration(
-                    labelText: "Subtitle",
-                  ),
-                ),
-                TextFormField(
-                  controller: priceEditingController,
-                  decoration: InputDecoration(
-                    labelText: "Price",
-                  ),
-                  validator: (String value) {
-                    if (double.tryParse(value) != null) {
-                      return null;
-                    }
-                    return 'Please enter float number.';
-                  },
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState.validate()) {
-                        onValid(
-                          Book(
-                            title: titleEditingController.text,
-                            subtitle: subtitleEditingController.text,
-                            price: '\$${priceEditingController.text}',
-                          ),
-                        );
-                        Navigator.of(context).pop();
-                      }
-                    },
-                    child: Text('Add'),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-```
-
-```dart {.line-numbers}
-// pages/book_details.dart
-
-import 'dart:ui';
-
-import 'package:flutter/material.dart';
-
-class BookPage extends StatelessWidget {
-  final double fontSize = 18;
-
-  final String price;
-  final String title;
-  final String subtitle;
-  final String isbn13;
-  final Image image;
-  final String publisher;
-  final String pages;
-  final String year;
-  final String rating;
-  final String desc;
-  final String authors;
-
-  const BookPage({
-    Key key,
-    @required this.title,
-    @required this.subtitle,
-    @required this.price,
-    this.isbn13 = "",
-    this.image,
-    this.publisher = "",
-    this.pages = "",
-    this.year = "",
-    this.rating = "",
-    this.desc = "",
-    this.authors = "",
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    Widget content;
-
-    content = view();
-
-    return Scaffold(
-      appBar: AppBar(),
-      body: SingleChildScrollView(
-        child: Center(
-          child: content,
-        ),
-      ),
-    );
-  }
-
-  Widget view() {
-    return Column(
-      children: [
-        Hero(
-          tag: "book-$title",
-          child: image != null ? image : Container(),
-        ),
-        Container(
-          width: window.physicalSize.width,
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RichText(
-                  textAlign: TextAlign.left,
-                  softWrap: true,
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Title: ',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                      TextSpan(
-                        text: title,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                RichText(
-                  textAlign: TextAlign.left,
-                  softWrap: true,
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Subtitle: ',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                      TextSpan(
-                        text: subtitle,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                RichText(
-                  textAlign: TextAlign.left,
-                  softWrap: true,
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Description: ',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                      TextSpan(
-                        text: desc,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  height: 30,
-                ),
-                RichText(
-                  textAlign: TextAlign.left,
-                  softWrap: true,
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Authors: ',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                      TextSpan(
-                        text: authors,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                RichText(
-                  textAlign: TextAlign.left,
-                  softWrap: true,
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Publisher: ',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                      TextSpan(
-                        text: publisher,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  height: 30,
-                ),
-                RichText(
-                  textAlign: TextAlign.left,
-                  softWrap: true,
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Pages: ',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                      TextSpan(
-                        text: pages,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                RichText(
-                  textAlign: TextAlign.left,
-                  softWrap: true,
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Year: ',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                      TextSpan(
-                        text: year,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                RichText(
-                  textAlign: TextAlign.left,
-                  softWrap: true,
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Rating: ',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                      TextSpan(
-                        text: rating,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: fontSize,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        )
-      ],
-    );
-  }
-}
-```
-
-```dart {.line-numbers}
-// widgets/book_list.dart
-
-import 'package:flutter/material.dart';
+import 'package:flutter_application_1/booklist/booklist_bloc.dart';
+import 'package:flutter_application_1/services/mock_book_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -520,10 +43,11 @@ import '../pages/book_add.dart';
 import '../pages/book_details.dart';
 import '../services/book_service.dart';
 import '../services/local_book_service.dart';
+import '../services/http_book_service.dart';
 import '../models/api_models.dart';
 
 class BookList extends StatefulWidget {
-  final BookService bookService = LocalBookService();
+  // final BookService bookService = MockBookService();
 
   BookList({Key key}) : super(key: key);
 
@@ -532,97 +56,132 @@ class BookList extends StatefulWidget {
 }
 
 class _BookListState extends State<BookList> {
-  List<Book> books = List();
+  List<Book> books;
   List<Widget> bookWidgets = List();
-  List<Widget> showWidgets = List();
   String searchLine = "";
+
+  GlobalKey<AnimatedListState> _anim = GlobalKey();
+  final BooklistBloc _booklistBloc = BooklistBloc(HttpBookService());
 
   @override
   void initState() {
     super.initState();
-    widget.bookService.getBooks().then((List<Book> books) async {
-      List<Widget> bookWidgets = List();
-      for (Book book in books) {
-        bookWidgets.add(await _buildItem(book));
-      }
-      setState(() {
-        this.books = books;
-        this.bookWidgets = bookWidgets;
-        this.showWidgets = bookWidgets.toList();
-      });
-    });
+    // _updateBookList();
+    _booklistBloc.add(GetBooklist(searchLine));
   }
 
   @override
   Widget build(BuildContext context) {
-    if (books.isEmpty) {
-      return Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-          child: TextField(
-            cursorColor: Colors.white,
-            style: TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              disabledBorder: InputBorder.none,
-              contentPadding:
-                  EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
-              labelText: "Search",
-              labelStyle: TextStyle(color: Colors.white),
-            ),
-            onChanged: (value) {
-              setState(() {
-                searchLine = value;
-                showWidgets = bookWidgets
-                    .where((w) =>
-                        books[bookWidgets.indexOf(w)].title.contains(value))
-                    .toList();
-              });
-            },
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 20.0),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.of(context).push(_bookAddPageRoute());
+    return BlocProvider(
+      create: (context) => _booklistBloc,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Padding(
+            padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+            child: TextField(
+              cursorColor: Colors.white,
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                contentPadding:
+                    EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
+                labelText: "Search",
+                labelStyle: TextStyle(color: Colors.white),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  searchLine = value;
+                });
+                _updateBookList();
               },
-              child: Icon(Icons.add),
             ),
-          )
-        ],
-      ),
-      body: Column(
-        children: [
-          Flexible(
-            child: showWidgets.length != 0
-                ? AnimatedContainer(
-                    duration: Duration(seconds: 1),
-                    child: ListView.builder(
-                      itemCount: showWidgets.length,
-                      itemBuilder: (context, index) => showWidgets[index],
-                    ),
-                  )
-                : Center(
-                    child: Text("No items found"),
-                  ),
           ),
-        ],
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(_bookAddPageRoute());
+                },
+                child: Icon(Icons.add),
+              ),
+            )
+          ],
+        ),
+        body: BlocConsumer(
+          cubit: _booklistBloc,
+          listener: (BuildContext context, state) {
+            if (state is BooklistError) {
+              Scaffold.of(context).showSnackBar(
+                SnackBar(content: Text(state.message)),
+              );
+            }
+          },
+          buildWhen: (previous, current) {
+            if (current is BooklistDeleted) {
+              setState(() {
+                books.remove(current.book);
+              });
+              _booklistBloc.add(GetBooklist(searchLine));
+              return false;
+            } else if (current is BooklistAdded) {
+              if (current.book.title.contains(searchLine)) {
+                setState(() {
+                  books.add(current.book);
+                });
+              }
+              _booklistBloc.add(GetBooklist(searchLine));
+              return false;
+            } else if (current is BooklistLoading &&
+                previous is! BooklistInitial) {
+              return false;
+            }
+            return true;
+          },
+          builder: (BuildContext context, state) {
+            if (state is BooklistLoading) {
+              return buildLoading();
+            } else if (state is BooklistLoaded) {
+              books = state.books.toList();
+              return buildLoaded(books);
+            } else {
+              // if error
+              return Center();
+            }
+          },
+        ),
       ),
     );
   }
 
-  Future<Widget> _buildItem(Book book) async {
+  Widget buildLoading() {
+    return Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget buildLoaded(List<Book> books) {
+    return Column(
+      children: [
+        Flexible(
+          child: books.length != 0
+              ? ListView.builder(
+                  itemCount: books.length,
+                  itemBuilder: (context, index) => _buildItem(books[index]),
+                )
+              : Center(
+                  child: Text("No items found"),
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildItem(Book book) {
     Image image = _getBookImage(book);
     return Slidable(
       key: Key(book.title),
@@ -646,15 +205,8 @@ class _BookListState extends State<BookList> {
             child: image != null ? image : SizedBox.shrink(),
             width: 50,
           ),
-          onTap: () async {
-            Book bookMore = await widget.bookService.getBook(book.isbn13);
-            if (bookMore != null) {
-              Navigator.of(context).push(_bookDetailsRoute(bookMore));
-            } else {
-              Scaffold.of(context).showSnackBar(SnackBar(
-                  duration: const Duration(seconds: 1),
-                  content: Text("Not found resurce")));
-            }
+          onTap: () {
+            Navigator.of(context).push(_bookDetailsRoute(book));
           },
         ),
       ),
@@ -664,64 +216,38 @@ class _BookListState extends State<BookList> {
           color: Colors.red,
           icon: Icons.delete,
           onTap: () {
-            _removeBook(book);
+            _deleteBook(book);
           },
         ),
       ],
     );
   }
 
-  void _removeBook(book) {
-    var index = books.indexOf(book);
+  void _updateBookList() async {
+    _booklistBloc.add(GetBooklist(searchLine));
+  }
 
-    setState(() {
-      if (showWidgets.contains(bookWidgets[index])) {
-        showWidgets.removeAt(showWidgets.indexOf(bookWidgets[index]));
-      }
-      books.removeAt(index);
-      bookWidgets.removeAt(index);
-    });
+  void _deleteBook(book) async {
+    _booklistBloc.add(DeleteBook(book));
   }
 
   void _addBook(Book book) async {
-    Widget w = await _buildItem(book);
-
-    setState(() {
-      books.add(book);
-      bookWidgets.add(w);
-      if (book.title.contains(searchLine)) {
-        showWidgets.add(w);
-      }
-    });
+    _booklistBloc.add(AddBook(book));
   }
 
   Image _getBookImage(Book book) {
-    if (widget.bookService is LocalBookService) {
-      if (book.image == "") {
-        return null;
-      } else {
-        return Image.asset('assets/Images/${book.image}');
-      }
-    } else {
+    if (book.image == "") {
       return null;
+    } else {
+      return Image.network(book.image);
+      // return Image.asset('assets/Images/${book.image}');
     }
   }
 
   Route _bookDetailsRoute(Book book) {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => BookPage(
-        image: _getBookImage(book),
-        title: book.title,
-        subtitle: book.subtitle,
-        price: book.price,
-        authors: book.authors,
-        desc: book.desc,
-        isbn13: book.isbn13,
-        pages: book.pages,
-        publisher: book.publisher,
-        rating: book.rating,
-        year: book.year,
-      ),
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          BookPage(book: book),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(1.0, 0.0);
         var end = Offset.zero;
@@ -764,11 +290,15 @@ class _BookListState extends State<BookList> {
 ```
 
 ```dart {.line-numbers}
-// widgets/gallery.dart
+// gallery.dart
 
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/gallery/gallery_cubit.dart';
+import 'package:flutter_application_1/services/gallery_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import 'package:image_picker/image_picker.dart';
@@ -784,6 +314,7 @@ class _GalleryState extends State<Gallery> {
   @override
   Widget build(BuildContext context) {
     return MyImagePicker(
+      initCount: 24,
       build: (context, images) => StaggeredGridView.countBuilder(
         crossAxisCount: 4,
         itemCount: images.length,
@@ -804,20 +335,47 @@ class _GalleryState extends State<Gallery> {
 
 class MyImagePicker extends StatefulWidget {
   final Function(BuildContext context, List<Image> images) build;
-  MyImagePicker({Key key, this.build}) : super(key: key);
+  final int initCount;
+
+  MyImagePicker({
+    Key key,
+    this.build,
+    this.initCount,
+  }) : super(key: key);
 
   @override
   _MyImagePickerState createState() => _MyImagePickerState();
 }
 
 class _MyImagePickerState extends State<MyImagePicker> {
-  List<Image> images = List();
+  final GalleryCubit _galleryCubit = GalleryCubit(HttpGalleryService());
+
+  List<Image> images;
   selectImage() async {
     File image = await ImagePicker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       setState(() {
         images.add(Image.file(image));
       });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    images = List();
+    final String image =
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAMSURBVBhXY/j//z8ABf4C/qc1gYQAAAAASUVORK5CYII=";
+    for (int i = 0; i < widget.initCount; i++) {
+      images.add(Image.memory(
+        base64.decode(image),
+        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+          return Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: CircularProgressIndicator(),
+          );
+        },
+      ));
     }
   }
 
@@ -830,69 +388,42 @@ class _MyImagePickerState extends State<MyImagePicker> {
             await selectImage();
           },
           child: Icon(Icons.add_photo_alternate)),
-      body: widget.build(context, images),
+      body: BlocProvider(
+        create: (context) => _galleryCubit,
+        child: BlocBuilder(
+          cubit: _galleryCubit,
+          builder: (context, state) {
+            if (state is GalleryInitial) {
+              _galleryCubit.loadImages();
+            }
+            if (state is GalleryLoaded) {
+              for (int i = 0; i < state.images.length; i++) {
+                images[i] = Image.network(
+                  state.images[i],
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;
+                    } else {
+                      return Padding(
+                        padding: const EdgeInsets.all(30.0),
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
+                );
+              }
+              return widget.build(context, images);
+            } else {
+              return widget.build(context, images);
+            }
+          },
+        ),
+      ),
     );
-  }
-}
-```
-
-```dart {.line-numbers}
-// services/book_service.dart
-
-import 'package:flutter_application_1/models/api_models.dart';
-
-abstract class BookService {
-  Future<List<Book>> getBooks();
-
-  Future<Book> getBook(String isbn13);
-}
-```
-
-```dart {.line-numbers}
-// services/local_book_service.dart
-import 'dart:convert';
-
-import 'package:flutter/services.dart';
-import 'package:flutter_application_1/models/api_models.dart';
-
-import 'book_service.dart';
-
-class LocalBookService implements BookService {
-  @override
-  Future<List<Book>> getBooks() async {
-    try {
-      // Read the file.
-      String data = await rootBundle.loadString('assets/BooksList.txt');
-      dynamic jsonBooks = jsonDecode(data);
-      List<Book> books = List();
-
-      for (dynamic book in jsonBooks['books']) {
-        books.add(Book.fromJson(book));
-      }
-      return books;
-    } catch (e) {
-      // If encountering an error, return [].
-      return [];
-    }
-  }
-
-  @override
-  Future<Book> getBook(String isbn13) async {
-    try {
-      // Read the file.
-      String data = await rootBundle.loadString('assets/id/$isbn13.txt');
-
-      dynamic jsonBook = jsonDecode(data);
-      Book book = Book.fromJson(jsonBook);
-      return book;
-    } catch (e) {
-      // If encountering an error, return null.
-      return null;
-    }
   }
 }
 ```
 
 ## Висновок
 
-Вданій лабораторній роботі було використано StaggeredGridView з бібліотеки flutter_staggered_grid_view для розміщення картинок по завданню. Також для вибору картинок було використано бібліотеку image_picker.
+Вданій лабораторній роботі було використано сторонній api для отримання даних прикладної області, даних про книг та катринки для гелереї. Загрузка даних зроблена асинхронно для того щоб не блокувати основний потік виконання програми.
