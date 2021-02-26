@@ -1,4 +1,4 @@
-# Lab 6
+# Lab 7
 
 Виконав: <br/>
 Студент групи: ІО-81 <br/>
@@ -7,466 +7,328 @@
 
 ## Варіант №2
 
-1. Візьміть за основу проєкт із лабораторної роботи 5.
-2. Додайте функціональність завантаження даних з мережі для вмісту двох останніх вкладок у додатку (список сутностей, детальна інформація про сутність, колекція зображень).
-3. Модифікуйте логіку відображення списку сутностей на третій вкладці:
-   a) при заході на екран відображається порожній список сутностей;
-   b) якщо в поле для пошуку ввести запит, то необхідно завантажити список сутностей з мережі за даним запитом та відобразити його;
-   c) завантажувати список необхідно тільки, якщо в поле для пошуку введено принаймні 3 символи, інакше повинен відображатися порожній список;
-   d) предметну область визначте за варіантом, де варіант = (номер залікової книжки mod 2) + 1:
+1. Візьміть за основу проєкт із лабораторної роботи 6.
+2. Додайте функціональність збереження завантажених даних з мережі у сховище.
+3. Сховище даних визначте за варіантом, де варіант = (номер залікової книжки mod 2) + 1:
 
-| Варіант 1                                                                                                                                                                                                                 | Варіант 2                                                                                                            |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Предметна область – фільми                                                                                                                                                                                                | Предметна область – книги                                                                                            |
-| URL-адреса для отримання даних – http://www.omdbapi.com/?apikey=API_KEY&s=REQUEST&page=1, де API_KEY – 7e9fe69e, REQUEST – запит із поля для пошуку.                                                                      | URL-адреса для отримання даних – https://api.itbook.store/1.0/search/REQUEST, де REQUEST – запит із поля для пошуку. |
-| Зверніть увагу на те, що використання ключа API_KEY обмежене до 1000 запитів на день, якщо буде вичерпано кількість запитів на день для наведеного ключа, то можна отримати власний ключ, зареєструвавшись за посиланням. |
+| Варіант 1            | Варіант 2         |
+| -------------------- | ----------------- |
+| Технологія Core Data | База даних SQLite |
 
-e) додайте відображення анімації індикатора активності (UIActivityIndicatorView) під час завантаження даних. 4. Модифікуйте логіку відображення екрану з повною інформацією про сутність:
-a) при кліку на комірку таблиці зі списком сутностей, необхідно завантажити повну інформацію про сутність з мережі та відкрити екран, де буде відображатися ця інформація;
-b) предметну область визначте за варіантом, де варіант = (номер залікової книжки mod 2) + 1:
-
-| Варіант 1                                                                                                                                                                                                                 | Варіант 2                                                                                                                                                       |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Предметна область – фільми                                                                                                                                                                                                | Предметна область – книги                                                                                                                                       |
-| URL-адреса для отримання даних – http://www.omdbapi.com/?apikey=API_KEY&i=IDENTIFIER, де API_KEY – 7e9fe69e, IDENTIFIER – ідентифікатор відповідного фільму (поле imdbID із сутності фільму).                             | URL-адреса для отримання даних – https://api.itbook.store/1.0/books/IDENTIFIER, де IDENTIFIER – ідентифікатор відповідної книги (поле isbn13 із сутності книги) |
-| Зверніть увагу на те, що використання ключа API_KEY обмежене до 1000 запитів на день, якщо буде вичерпано кількість запитів на день для наведеного ключа, то можна отримати власний ключ, зареєструвавшись за посиланням. |
-
-c) додайте відображення анімації індикатора активності (UIActivityIndicatorView) під час завантаження даних. 5. Модифікуйте логіку відображення колекції зображень на четвертій вкладці:
-a) при заході на екран відображається порожня колекція зображень, після цього необхідно завантажити список зображень з мережі та відобразити його;
-b) використовуйте наступну URL-адресу для отримання даних: https://pixabay.com/api/?key=API_KEY&q=REQUEST&image_type=photo&per_page=COUNT, де API_KEY – 19193969-87191e5db266905fe8936d565, REQUEST та COUNT – оберіть із таблиці за варіантом нижче, де варіант = (номер залікової книжки mod 6) + 1;
-| Варіант 1 | Варіант 2 |
-| --------- | --------- |
-| REQUEST – “yellow+flowers” | REQUEST – “hot+summer” |
-| COUNT – 27 | COUNT – 24 |
-
-| Варіант 3                 | Варіант 4              |
-| ------------------------- | ---------------------- |
-| REQUEST – “small+animals” | REQUEST – “night+city” |
-| COUNT – 18                | COUNT – 27             |
-
-| Варіант 5             | Варіант 6            |
-| --------------------- | -------------------- |
-| REQUEST – “fun+party” | REQUEST – “red+cars” |
-| COUNT – 30            | COUNT – 21           |
-
-c) зверніть увагу на те, що використання ключа API_KEY обмежене до 5000 запитів на годину, якщо буде вичерпано кількість запитів на годину для наведеного ключа, то можна отримати власний ключ, зареєструвавшись за посиланням;
-d) додайте відображення анімації індикатора активності (UIActivityIndicatorView) під час завантаження даних.
-
-6. Зверніть увагу на те, що комірки таблиці та колекції перевикористовуються, а завантаження зображень сутностей, що відображаються в комірках, зазвичай відбувається асинхронно, тому поширена ситуація, коли завантажене зображення встановлюється в комірку, яка вже не відображає сутність, до якої відноситься зображення.
-7. Зверніть увагу на те, що завантаження даних не повинно відбуватися на головному потоці додатка, оскільки це тривала операція і не потрібно в цей час повністю блокувати роботу додатка.
-8. Зверніть увагу на те, що в поле пошуку можливо ввести не латинські літери або спеціальні символи, тому потрібно передбачити таку ситуацію, щоб додаток її правильно обробив.
-9. Переконайтеся, що можете запустити проєкт, та що все працює коректно.
-10. Закомітьте та відправте ваш проєкт до будь-якої системи контролю версій.
-11. Підготуйте протокол за шаблоном.
-12. Надішліть виконане завдання через Google Classroom - додайте посилання до вашого проєкту та протокол.
+4. Всі дані, які завантажуються з мережі, необхідно зберегти у сховище.
+5. Модифікуйте механізм завантаження даних для відображення у таблиці сутностей та колекції зображень наступним чином:
+   a) спочатку виконується запит за відповідною URL-адресою, як це реалізовано в лабораторній роботі 6;
+   b) якщо дані успішно отримані, то вони зберігаються у сховище та використовуються для відображення;
+   c) якщо дані з мережі не отримано або виникла якась помилка (код статусу відповіді не 200, відсутнє Інтернет з’єднання, тощо), то необхідно спробувати отримані дані для відповідного запиту зі сховища:
+   i. якщо дані зі сховища успішно отримані, то вони використовуються для відображення;
+   ii. якщо дані у сховищі відсутні, то необхідно вивести повідомлення, що неможливо отримати дані для заданого запиту.
+6. Додайте кешування зображень, які завантажуються, так що, якщо потрібно повторно відобразити зображення, то воно не завантажується з мережі, а отримується з кешу зображень.
+7. Наприклад:
+   a) користувач вперше запускає додаток з наявним Інтернет з’єднанням;
+   b) на екрані списку сутностей користувач вводить запит у поле пошуку;
+   c) дані успішно завантажуються з мережі, зберігаються у сховище та відображаються в таблиці;
+   d) користувач видаляє запит з поля пошуку;
+   e) відображається порожній список;
+   f) користувач вимикає Інтернет з’єднання на пристрої;
+   g) користувач вводить запит з кроку b у поле пошуку;
+   h) при завантаженні даних з мережі виникає помилка, оскільки відсутнє Інтернет з’єднання;
+   i) відбувається спроба отримати дані зі сховища;
+   j) оскільки для запиту з кроку b у сховищі є дані (крок c), то вони відображаються в таблиці;
+   k) користувач вводить інший запит у поле пошуку;
+   l) при завантаженні даних з мережі виникає помилка, оскільки відсутнє Інтернет з’єднання;
+   m) відбувається спроба отримати дані зі сховища;
+   n) оскільки для запиту з кроку k у сховищі дані відсутні, то виводиться повідомлення, що неможливо отримати дані для заданого запиту;
+   o) відповідна поведінка повинна бути реалізована для колекції зображень:
+   i. дані зберігаються у сховище;
+   ii. зображення зберігаються у сховище або на диск.
+8. Переконайтеся, що можете запустити проєкт, та що все працює коректно.
+9. Закомітьте та відправте ваш проєкт до будь-якої системи контролю версій.
+10. Підготуйте протокол за шаблоном.
+11. Надішліть виконане завдання через Google Classroom - додайте посилання до вашого проєкту та протокол.
 
 ## приклад роботи додатка
 
-Приклад роботи в портретному режимі
+Приклад роботи для списку книг
 (відео в .mp4 лижить в readme_images)
-![](readme_images/portrait_video.gif)
+![](readme_images/video2.gif)
 <br/>
-Приклад роботи в портретному режимі
+Приклад роботи для галереї
 (відео в .mp4 лижить в readme_images)
-![](readme_images/landscape_video.gif)
+![](readme_images/video1.gif)
 
 ## Лістинг коду
 
 ```dart {.line-numbers}
-// book_list.dart
+// databases/db_provider.dart
 
-import 'package:flutter/material.dart';
-import 'package:flutter_application_1/booklist/booklist_bloc.dart';
-import 'package:flutter_application_1/services/mock_book_service.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:typed_data';
 
-import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_application_1/models/api_models.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite/sqlite_api.dart';
+import 'package:path/path.dart';
 
-import '../pages/book_add.dart';
-import '../pages/book_details.dart';
-import '../services/book_service.dart';
-import '../services/local_book_service.dart';
-import '../services/http_book_service.dart';
-import '../models/api_models.dart';
+class DBProvider {
+  DBProvider._();
+  static final DBProvider db = DBProvider._();
+  static Database _database;
 
-class BookList extends StatefulWidget {
-  // final BookService bookService = MockBookService();
-
-  BookList({Key key}) : super(key: key);
-
-  @override
-  _BookListState createState() => _BookListState();
-}
-
-class _BookListState extends State<BookList> {
-  List<Book> books;
-  List<Widget> bookWidgets = List();
-  String searchLine = "";
-
-  GlobalKey<AnimatedListState> _anim = GlobalKey();
-  final BooklistBloc _booklistBloc = BooklistBloc(HttpBookService());
-
-  @override
-  void initState() {
-    super.initState();
-    // _updateBookList();
-    _booklistBloc.add(GetBooklist(searchLine));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => _booklistBloc,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Padding(
-            padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-            child: TextField(
-              cursorColor: Colors.white,
-              style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                errorBorder: InputBorder.none,
-                disabledBorder: InputBorder.none,
-                contentPadding:
-                    EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
-                labelText: "Search",
-                labelStyle: TextStyle(color: Colors.white),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  searchLine = value;
-                });
-                _updateBookList();
-              },
-            ),
-          ),
-          actions: [
-            Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(_bookAddPageRoute());
-                },
-                child: Icon(Icons.add),
-              ),
-            )
-          ],
-        ),
-        body: BlocConsumer(
-          cubit: _booklistBloc,
-          listener: (BuildContext context, state) {
-            if (state is BooklistError) {
-              Scaffold.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
-            }
-          },
-          buildWhen: (previous, current) {
-            if (current is BooklistDeleted) {
-              setState(() {
-                books.remove(current.book);
-              });
-              _booklistBloc.add(GetBooklist(searchLine));
-              return false;
-            } else if (current is BooklistAdded) {
-              if (current.book.title.contains(searchLine)) {
-                setState(() {
-                  books.add(current.book);
-                });
-              }
-              _booklistBloc.add(GetBooklist(searchLine));
-              return false;
-            } else if (current is BooklistLoading &&
-                previous is! BooklistInitial) {
-              return false;
-            }
-            return true;
-          },
-          builder: (BuildContext context, state) {
-            if (state is BooklistLoading) {
-              return buildLoading();
-            } else if (state is BooklistLoaded) {
-              books = state.books.toList();
-              return buildLoaded(books);
-            } else {
-              // if error
-              return Center();
-            }
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget buildLoading() {
-    return Center(
-      child: CircularProgressIndicator(),
-    );
-  }
-
-  Widget buildLoaded(List<Book> books) {
-    return Column(
-      children: [
-        Flexible(
-          child: books.length != 0
-              ? ListView.builder(
-                  itemCount: books.length,
-                  itemBuilder: (context, index) => _buildItem(books[index]),
-                )
-              : Center(
-                  child: Text("No items found"),
-                ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildItem(Book book) {
-    Image image = _getBookImage(book);
-    return Slidable(
-      key: Key(book.title),
-      actionPane: SlidableScrollActionPane(),
-      child: Container(
-        color: Colors.white,
-        child: ListTile(
-          isThreeLine: true,
-          title: Text(book.title),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(book.subtitle),
-              Padding(
-                padding: const EdgeInsets.only(top: 15),
-                child: Text(book.price),
-              ),
-            ],
-          ),
-          leading: Container(
-            child: image != null ? image : SizedBox.shrink(),
-            width: 50,
-          ),
-          onTap: () {
-            Navigator.of(context).push(_bookDetailsRoute(book));
-          },
-        ),
-      ),
-      secondaryActions: [
-        IconSlideAction(
-          caption: 'Delete',
-          color: Colors.red,
-          icon: Icons.delete,
-          onTap: () {
-            _deleteBook(book);
-          },
-        ),
-      ],
-    );
-  }
-
-  void _updateBookList() async {
-    _booklistBloc.add(GetBooklist(searchLine));
-  }
-
-  void _deleteBook(book) async {
-    _booklistBloc.add(DeleteBook(book));
-  }
-
-  void _addBook(Book book) async {
-    _booklistBloc.add(AddBook(book));
-  }
-
-  Image _getBookImage(Book book) {
-    if (book.image == "") {
-      return null;
-    } else {
-      return Image.network(book.image);
-      // return Image.asset('assets/Images/${book.image}');
+  Future<Database> get database async {
+    if (_database != null) {
+      return _database;
     }
+
+    _database = await initDB();
+    return _database;
   }
 
-  Route _bookDetailsRoute(Book book) {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          BookPage(book: book),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        var begin = Offset(1.0, 0.0);
-        var end = Offset.zero;
-        var curve = Curves.ease;
-
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
+  initDB() async {
+    return await openDatabase(
+      join(await getDatabasesPath(), 'super_db2.db'),
+      onCreate: (db, version) async {
+        await db.execute('''
+        CREATE TABLE books (
+          isbn13 TEXT PRIMARY KEY,
+          title TEXT,
+          subtitle TEXT,
+          price TEXT,
+          image BLOB
         );
+        ''');
+        await db.execute('''
+        CREATE TABLE books_details (
+          isbn13 TEXT PRIMARY KEY,
+          title TEXT,
+          subtitle TEXT,
+          price TEXT,
+          image BLOB,
+          publisher TEXT,
+          pages TEXT,
+          year TEXT,
+          rating TEXT,
+          desc TEXT,
+          authors TEXT
+        );
+        ''');
+        await db.execute('''
+        CREATE TABLE gallery (
+          url TEXT PRIMARY KEY,
+          image BLOB
+        );
+        ''');
+        await db.execute('''
+        CREATE TABLE gallery_urls (
+          url TEXT PRIMARY KEY
+        );
+        ''');
       },
+      version: 1,
     );
   }
 
-  Route _bookAddPageRoute() {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return BookAdd(
-          onValid: (book) => _addBook(book),
-        );
-      },
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        var begin = Offset(1.0, 0.0);
-        var end = Offset.zero;
-        var curve = Curves.ease;
+  newBook(Book newBook) async {
+    final db = await database;
 
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
+    var res = await db.insert(
+      "books_details",
+      newBook.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    return res;
+  }
+
+  newBooks(List<Book> books) async {
+    if (books.length == 0) {
+      return;
+    }
+    final db = await database;
+
+    Batch batch = db.batch();
+    for (Book book in books) {
+      batch.insert(
+        'books',
+        {
+          'isbn13': book.isbn13,
+          'title': book.title,
+          'subtitle': book.subtitle,
+          'price': book.price,
+          'image': book.image,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+
+    await batch.commit(noResult: true);
+  }
+
+  Future<Book> getBook(String isbn13) async {
+    if (isbn13 == null) {
+      return null;
+    }
+    final db = await database;
+    var res = await db.query(
+      "books_details",
+      where: "isbn13 = ?",
+      whereArgs: [isbn13],
+    );
+    return res.isNotEmpty ? Book.fromMap(res.first) : null;
+  }
+
+  Future<List<Book>> getBooks(String searchString) async {
+    final db = await database;
+    var res = await db.query("books", where: "title LIKE '%$searchString%'");
+    return List.generate(res.length, (index) => Book.fromMap(res[index]));
+  }
+
+  newImage(String url, Uint8List image) async {
+    final db = await database;
+    await db.insert(
+      'gallery',
+      {'url': url, 'image': image},
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+  }
+
+  newImages(List<String> urls) async {
+    final db = await database;
+    Batch batch = db.batch();
+    for (String url in urls) {
+      batch.insert(
+        'gallery_urls',
+        {'url': url},
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(noResult: true);
+  }
+
+  Future<Uint8List> getImage(String url) async {
+    final db = await database;
+    var res = await db.query(
+      "gallery",
+      where: "url = ?",
+      whereArgs: [url],
+    );
+    return res.isNotEmpty ? res.first['image'] : null;
+  }
+
+  Future<List<String>> getImages() async {
+    final db = await database;
+    var res = await db.query('gallery_urls');
+    return List.generate(res.length, (index) => res[index]['url']);
   }
 }
 ```
 
-```dart {.line-numbers}
-// gallery.dart
+```dart {.line_numbers}
+// services/book_service_decorator.dart
 
-import 'dart:io';
-import 'dart:convert';
+import 'package:flutter_application_1/databases/db_provider.dart';
+import 'package:flutter_application_1/models/api_models.dart';
+import 'package:flutter_application_1/services/book_service.dart';
+import 'package:flutter_application_1/services/exceptions.dart';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_application_1/gallery/gallery_cubit.dart';
+abstract class BookServiceDecorator extends BookService {
+  // ignore: unused_element
+  BookService get bookService;
+}
+
+class SqliteBookServiceDecorator implements BookServiceDecorator {
+  final BookService _bookService;
+
+  SqliteBookServiceDecorator(this._bookService);
+
+  @override
+  BookService get bookService => _bookService;
+
+  @override
+  Future<void> addBook(Book book) async {
+    await bookService.addBook(book);
+  }
+
+  @override
+  Future<Book> getBook(String isbn13) async {
+    try {
+      final book = await bookService.getBook(isbn13);
+      DBProvider.db.newBook(book);
+      return book;
+    } on NetworkException {
+      final res = await DBProvider.db.getBook(isbn13);
+      if (res == null) {
+        throw NotFoundException();
+      }
+      return res;
+    }
+  }
+
+  @override
+  Future<List<Book>> getBooks(String searchString) async {
+    try {
+      final books = await bookService.getBooks(searchString);
+      DBProvider.db.newBooks(books);
+      return books;
+    } on NetworkException {
+      return DBProvider.db.getBooks(searchString);
+    }
+  }
+
+  @override
+  Future<void> removeBook(Book book) async {
+    await bookService.removeBook(book);
+  }
+}
+```
+
+```dart {.line_numbers}
+// services/gallery_service_decorator.dart
+
+import 'dart:typed_data';
+
+import 'package:flutter_application_1/databases/db_provider.dart';
+import 'package:flutter_application_1/services/exceptions.dart';
 import 'package:flutter_application_1/services/gallery_service.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
-import 'package:image_picker/image_picker.dart';
-
-class Gallery extends StatefulWidget {
-  Gallery({Key key}) : super(key: key);
-
-  @override
-  _GalleryState createState() => _GalleryState();
+abstract class GallaryServiceDecorator extends GalleryService {
+  GalleryService get galleryService;
 }
 
-class _GalleryState extends State<Gallery> {
-  @override
-  Widget build(BuildContext context) {
-    return MyImagePicker(
-      initCount: 24,
-      build: (context, images) => StaggeredGridView.countBuilder(
-        crossAxisCount: 4,
-        itemCount: images.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            child: images[index],
-            color: Colors.grey[300],
-          );
-        },
-        staggeredTileBuilder: (int index) => StaggeredTile.count(
-            (index % 8 == 1) ? 3 : 1, (index % 8 == 1) ? 3 : 1),
-        mainAxisSpacing: 8.0,
-        crossAxisSpacing: 8.0,
-      ),
-    );
-  }
-}
+class SqliteGalleryServiceDecorator implements GallaryServiceDecorator {
+  final DBProvider db = DBProvider.db;
+  final GalleryService _galleryService;
 
-class MyImagePicker extends StatefulWidget {
-  final Function(BuildContext context, List<Image> images) build;
-  final int initCount;
-
-  MyImagePicker({
-    Key key,
-    this.build,
-    this.initCount,
-  }) : super(key: key);
+  SqliteGalleryServiceDecorator(this._galleryService);
 
   @override
-  _MyImagePickerState createState() => _MyImagePickerState();
-}
+  GalleryService get galleryService => _galleryService;
 
-class _MyImagePickerState extends State<MyImagePicker> {
-  final GalleryCubit _galleryCubit = GalleryCubit(HttpGalleryService());
-
-  List<Image> images;
-  selectImage() async {
-    File image = await ImagePicker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        images.add(Image.file(image));
-      });
+  @override
+  Future<Uint8List> getImage(String url) async {
+    try {
+      var res = await db.getImage(url);
+      if (res != null) {
+        return res;
+      }
+      final image = await galleryService.getImage(url);
+      db.newImage(url, image);
+      return image;
+    } on NetworkException {
+      return await db.getImage(url);
     }
   }
 
   @override
-  void initState() {
-    super.initState();
-    images = List();
-    final String image =
-        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAAMSURBVBhXY/j//z8ABf4C/qc1gYQAAAAASUVORK5CYII=";
-    for (int i = 0; i < widget.initCount; i++) {
-      images.add(Image.memory(
-        base64.decode(image),
-        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-          return Padding(
-            padding: const EdgeInsets.all(30.0),
-            child: CircularProgressIndicator(),
-          );
-        },
-      ));
+  Future<List<String>> getImages() async {
+    try {
+      final urls = await galleryService.getImages();
+      await db.newImages(urls);
+      return urls;
+    } on NetworkException {
+      return db.getImages();
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
-      floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            await selectImage();
-          },
-          child: Icon(Icons.add_photo_alternate)),
-      body: BlocProvider(
-        create: (context) => _galleryCubit,
-        child: BlocBuilder(
-          cubit: _galleryCubit,
-          builder: (context, state) {
-            if (state is GalleryInitial) {
-              _galleryCubit.loadImages();
-            }
-            if (state is GalleryLoaded) {
-              for (int i = 0; i < state.images.length; i++) {
-                images[i] = Image.network(
-                  state.images[i],
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) {
-                      return child;
-                    } else {
-                      return Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  },
-                );
-              }
-              return widget.build(context, images);
-            } else {
-              return widget.build(context, images);
-            }
-          },
-        ),
-      ),
-    );
   }
 }
 ```
 
 ## Висновок
 
-Вданій лабораторній роботі було використано сторонній api для отримання даних прикладної області, даних про книг та катринки для гелереї. Загрузка даних зроблена асинхронно для того щоб не блокувати основний потік виконання програми.
+Вданій лабораторній роботі боло добавнело локальну базу даних, в яку зберігаються картинки та інформація про книжки. Виникнули проблеми при відключені wifi в емулятора всерівно працював інтернет, прийшлось відключати wifi на машинині на якій запускався емулятор. Крім даної проблеми більше ніякий затруднень не виникло.
