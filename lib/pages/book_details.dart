@@ -3,15 +3,15 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/book_details/book_details_cubit.dart';
 import 'package:flutter_application_1/models/api_models.dart';
+import 'package:flutter_application_1/services/book_service_decorator.dart';
 import 'package:flutter_application_1/services/http_book_service.dart';
-import 'package:flutter_application_1/services/mock_book_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BookPage extends StatelessWidget {
   final double fontSize = 18;
 
   final BookDetailsCubit _bookDetailsCubit =
-      BookDetailsCubit(HttpBookService());
+      BookDetailsCubit(SqliteBookServiceDecorator(HttpBookService()));
 
   BookPage({
     Key key,
@@ -253,10 +253,10 @@ class BookPage extends StatelessWidget {
   }
 
   Image _getBookImage(Book book) {
-    if (book.image == "") {
+    if (book.image == null) {
       return null;
     } else {
-      return Image.network(book.image);
+      return Image.memory(book.image);
       // return Image.asset('assets/Images/${book.image}');
     }
   }

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/booklist/booklist_bloc.dart';
-import 'package:flutter_application_1/services/mock_book_service.dart';
+import 'package:flutter_application_1/helpers/debouncer.dart';
+import 'package:flutter_application_1/services/book_service_decorator.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../pages/book_add.dart';
 import '../pages/book_details.dart';
-import '../services/book_service.dart';
-import '../services/local_book_service.dart';
 import '../services/http_book_service.dart';
 import '../models/api_models.dart';
 
@@ -26,13 +25,14 @@ class _BookListState extends State<BookList> {
   List<Widget> bookWidgets = List();
   String searchLine = "";
 
-  GlobalKey<AnimatedListState> _anim = GlobalKey();
-  final BooklistBloc _booklistBloc = BooklistBloc(HttpBookService());
+  final _debouncer = Debouncer(milliseconds: 500);
+
+  final BooklistBloc _booklistBloc =
+      BooklistBloc(SqliteBookServiceDecorator(HttpBookService()));
 
   @override
   void initState() {
     super.initState();
-    // _updateBookList();
     _booklistBloc.add(GetBooklist(searchLine));
   }
 
@@ -44,25 +44,17 @@ class _BookListState extends State<BookList> {
         appBar: AppBar(
           title: Padding(
             padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-            child: TextField(
-              cursorColor: Colors.white,
-              style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                errorBorder: InputBorder.none,
-                disabledBorder: InputBorder.none,
-                contentPadding:
-                    EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
-                labelText: "Search",
-                labelStyle: TextStyle(color: Colors.white),
-              ),
+            child: SearchInputField(
               onChanged: (value) {
-                setState(() {
-                  searchLine = value;
+                _debouncer.run(() {
+                  if (value != searchLine) {
+                    setState(() {
+                      searchLine = value;
+                    });
+                    // ignore: close_sinks
+                    _updateBookList();
+                  }
                 });
-                _updateBookList();
               },
             ),
           ),
@@ -104,7 +96,7 @@ class _BookListState extends State<BookList> {
               return false;
             } else if (current is BooklistLoading &&
                 previous is! BooklistInitial) {
-              return false;
+              // return false;
             }
             return true;
           },
@@ -202,10 +194,10 @@ class _BookListState extends State<BookList> {
   }
 
   Image _getBookImage(Book book) {
-    if (book.image == "") {
+    if (book.image == null) {
       return null;
     } else {
-      return Image.network(book.image);
+      return Image.memory(book.image);
       // return Image.asset('assets/Images/${book.image}');
     }
   }
@@ -250,6 +242,38 @@ class _BookListState extends State<BookList> {
           child: child,
         );
       },
+    );
+  }
+}
+
+class SearchInputField extends StatelessWidget {
+  final Function(String) onChanged;
+
+  const SearchInputField({
+    Key key,
+    this.onChanged,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+      child: TextField(
+        cursorColor: Colors.white,
+        style: TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          contentPadding:
+              EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
+          labelText: "Search",
+          labelStyle: TextStyle(color: Colors.white),
+        ),
+        onChanged: onChanged,
+      ),
     );
   }
 }

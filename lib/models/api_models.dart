@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 @immutable
@@ -6,7 +9,7 @@ class Book {
   final String subtitle;
   final String isbn13;
   final String price;
-  final String image;
+  final Uint8List image;
 
   final String authors;
   final String publisher;
@@ -20,32 +23,55 @@ class Book {
     @required this.subtitle,
     @required this.price,
     this.isbn13 = "",
-    this.image = "",
     this.publisher = "",
     this.pages = "",
     this.year = "",
     this.rating = "",
     this.desc = "",
     this.authors = "",
+    this.image,
   });
-
-  Book.fromJson(dynamic json)
-      : this(
-          title: json['title'],
-          subtitle: json['subtitle'],
-          isbn13: json['isbn13'],
-          price: json['price'],
-          image: json['image'],
-          publisher: json['publisher'],
-          pages: json['pages'],
-          year: json['year'],
-          rating: json['rating'],
-          desc: json['desc'],
-          authors: json['authors'],
-        );
 
   @override
   String toString() {
     return 'Book: {title: $title, subtitle: $subtitle, isbn13: $isbn13, price: $price, image: $image}';
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'subtitle': subtitle,
+      'isbn13': isbn13,
+      'price': price,
+      'image': image == null ? "" : image,
+      'authors': authors,
+      'publisher': publisher,
+      'pages': pages,
+      'year': year,
+      'rating': rating,
+      'desc': desc,
+    };
+  }
+
+  factory Book.fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+
+    return Book(
+      title: map['title'],
+      subtitle: map['subtitle'],
+      isbn13: map['isbn13'],
+      price: map['price'],
+      image: map['image'] != "" ? map['image'] : null,
+      authors: map['authors'] == null ? "" : map['authors'],
+      publisher: map['publisher'] == null ? "" : map['publisher'],
+      pages: map['pages'] == null ? "" : map['pages'],
+      year: map['year'] == null ? "" : map['year'],
+      rating: map['rating'] == null ? "" : map['rating'],
+      desc: map['desc'] == null ? "" : map['desc'],
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Book.fromJson(String source) => Book.fromMap(json.decode(source));
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_application_1/models/api_models.dart';
 import 'package:flutter_application_1/services/book_service.dart';
+import 'package:flutter_application_1/services/exceptions.dart';
 import 'package:meta/meta.dart';
 
 part 'booklist_event.dart';
@@ -18,9 +19,14 @@ class BooklistBloc extends Bloc<BooklistEvent, BooklistState> {
     BooklistEvent event,
   ) async* {
     if (event is GetBooklist) {
-      yield BooklistLoading();
-      final List<Book> books = await _bookService.getBooks(event.searchString);
-      yield BooklistLoaded(books);
+      try {
+        yield BooklistLoading();
+        final List<Book> books =
+            await _bookService.getBooks(event.searchString);
+        yield BooklistLoaded(books);
+      } on NetworkException {
+        yield BooklistError('Network exception');
+      }
     } else if (event is DeleteBook) {
       await _bookService.removeBook(event.book);
       yield BooklistDeleted(event.book);

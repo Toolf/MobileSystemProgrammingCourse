@@ -3,11 +3,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/gallery/gallery_cubit.dart';
+import 'package:flutter_application_1/gallery/image/image_cubit.dart';
 import 'package:flutter_application_1/services/gallery_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import 'package:image_picker/image_picker.dart';
+
+import '../injection.dart';
 
 class Gallery extends StatefulWidget {
   Gallery({Key key}) : super(key: key);
@@ -40,7 +43,7 @@ class _GalleryState extends State<Gallery> {
 }
 
 class MyImagePicker extends StatefulWidget {
-  final Function(BuildContext context, List<Image> images) build;
+  final Function(BuildContext context, List<Widget> images) build;
   final int initCount;
 
   MyImagePicker({
@@ -54,10 +57,11 @@ class MyImagePicker extends StatefulWidget {
 }
 
 class _MyImagePickerState extends State<MyImagePicker> {
-  final GalleryCubit _galleryCubit = GalleryCubit(HttpGalleryService());
+  final GalleryCubit _galleryCubit = GalleryCubit(getIt<GalleryService>());
 
-  List<Image> images;
+  List<Widget> images;
   selectImage() async {
+    // ignore: deprecated_member_use
     File image = await ImagePicker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       setState(() {
@@ -103,19 +107,37 @@ class _MyImagePickerState extends State<MyImagePicker> {
               _galleryCubit.loadImages();
             }
             if (state is GalleryLoaded) {
-              for (int i = 0; i < state.images.length; i++) {
-                images[i] = Image.network(
-                  state.images[i],
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) {
-                      return child;
-                    } else {
-                      return Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  },
+              if (state.images.length == 0) {
+                return widget.build(context, images);
+              }
+              for (int i = 0; i < widget.initCount; i++) {
+                final url = state.images[i];
+                final _cubit = ImageCubit(
+                  getIt<GalleryService>(),
+                );
+                images[i] = BlocProvider<ImageCubit>(
+                  create: (context) => _cubit,
+                  child: BlocBuilder(
+                    cubit: _cubit,
+                    builder: (BuildContext context, state) {
+                      if (state is ImageInitial) {
+                        _cubit.loadImage(url);
+                        return Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (state is ImageLoaded) {
+                        return Image.memory(state.image, fit: BoxFit.contain);
+                      } else if (state is ImageLoading) {
+                        return Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: CircularProgressIndicator(),
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
+                  ),
                 );
               }
               return widget.build(context, images);

@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void onTabTapped(int index) {
+  void onTabTapped(int index) async {
     setState(() {
       _currentIndex = index;
     });

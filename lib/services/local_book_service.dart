@@ -17,6 +17,14 @@ class LocalBookService implements BookService {
       dynamic jsonBooks = jsonDecode(data);
       books = List();
       for (dynamic book in jsonBooks['books']) {
+        if (book['image'] == "") {
+          book['image'] = null;
+        } else {
+          book['image'] =
+              (await rootBundle.load('assets/Images/${book['image']}'))
+                  .buffer
+                  .asUint8List();
+        }
         books.add(Book.fromJson(book));
       }
     } catch (e) {
@@ -37,6 +45,14 @@ class LocalBookService implements BookService {
       String data = await rootBundle.loadString('assets/id/$isbn13.txt');
 
       dynamic jsonBook = jsonDecode(data);
+      if (jsonBook['image'] == "") {
+        jsonBook['image'] = null;
+      } else {
+        jsonBook['image'] =
+            (await rootBundle.load('assets/Images/${jsonBook['image']}'))
+                .buffer
+                .asUint8List();
+      }
       Book book = Book.fromJson(jsonBook);
       return book;
     } catch (e) {
